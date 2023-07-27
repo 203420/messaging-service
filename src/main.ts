@@ -1,10 +1,13 @@
 import { config as dotEnvConfig } from "dotenv";
 dotEnvConfig();
 
+import "moment-timezone";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import http from "http";
+import moment from "moment";
 import path from "path";
 import { Server as WebSockerServer } from "socket.io";
 
@@ -15,6 +18,7 @@ const currentDir = __dirname;
 const parentDir = path.dirname(currentDir);
 
 function boostrap() {
+  moment.tz.setDefault("America/Mexico_City");
   const app = express();
   const server = http.createServer(app);
   const io = new WebSockerServer(server, {
@@ -42,7 +46,7 @@ function boostrap() {
 
     socket.on("client:new-message", (userId) => {
       socket.broadcast.emit("server:new-message", userId);
-      socket.emit("server:load-messages", userId);
+      socket.broadcast.emit("server:load-messages", userId);
       console.log("New message");
     });
   });
